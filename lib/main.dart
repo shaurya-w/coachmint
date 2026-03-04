@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Ensure this is in pubspec.yaml
 import 'screens/schemes_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  var Supabase;
+  // Load environment variables from the .env file in root
+  await dotenv.load(fileName: ".env");
+
+  // Initialize Supabase using class reference, not a local variable
   await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    url: dotenv.env['SUPABASE_URL'] ?? '', 
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
   runApp(const MyApp());
