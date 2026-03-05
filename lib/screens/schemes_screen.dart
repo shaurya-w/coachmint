@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart'; //
 import '../service/scheme_service.dart';
-import 'package:url_launcher/url_launcher.dart'; // Import the launcher
 
 class SchemesScreen extends StatefulWidget {
   const SchemesScreen({super.key});
@@ -19,19 +19,21 @@ class _SchemesScreenState extends State<SchemesScreen> {
     _schemesFuture = _service.fetchWelfareSchemes();
   }
 
-  // Helper function to launch the URL
-  Future<void> _launchURL(String? urlString) async {
+  // Proper redirect function
+  Future<void> _launchSchemeURL(String? urlString) async {
     if (urlString == null || urlString.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("No application link available")),
+          const SnackBar(content: Text('No application link available for this scheme.')),
         );
       }
       return;
     }
 
     final Uri url = Uri.parse(urlString);
+    
     try {
+      // mode: LaunchMode.externalApplication opens the browser outside the app
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       } else {
@@ -40,7 +42,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error opening link: $e")),
+          SnackBar(content: Text('Error: $e')),
         );
       }
     }
@@ -51,7 +53,8 @@ class _SchemesScreenState extends State<SchemesScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121417),
       appBar: AppBar(
-        title: const Text('Govt Schemes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Government Schemes', 
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -81,13 +84,21 @@ class _SchemesScreenState extends State<SchemesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      scheme['name'] ?? 'Untitled Scheme',
-                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                      scheme['name'] ?? 'Unknown Scheme',
+                      style: const TextStyle(
+                        color: Colors.white, 
+                        fontSize: 20, 
+                        fontWeight: FontWeight.bold
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       scheme['description'] ?? '',
-                      style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14, height: 1.4),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6), 
+                        fontSize: 14, 
+                        height: 1.4
+                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
@@ -105,10 +116,14 @@ class _SchemesScreenState extends State<SchemesScreen> {
                           backgroundColor: const Color(0xFF00E676),
                           foregroundColor: Colors.black,
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)
+                          ),
                         ),
-                        onPressed: () => _launchURL(scheme['apply_url']), // Link applied here
-                        child: const Text('Apply Now', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        // Redirect logic triggered here
+                        onPressed: () => _launchSchemeURL(scheme['apply_url']), 
+                        child: const Text('Apply Now', 
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),
                   ],
@@ -134,7 +149,14 @@ class _SchemesScreenState extends State<SchemesScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: const TextStyle(color: Color(0xFF00E676), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+        Text(label.toUpperCase(), 
+          style: const TextStyle(
+            color: Color(0xFF00E676), 
+            fontSize: 11, 
+            fontWeight: FontWeight.w900, 
+            letterSpacing: 1.2
+          )
+        ),
         const SizedBox(height: 4),
         Text(displayValue, style: const TextStyle(color: Colors.white, fontSize: 14)),
       ],
